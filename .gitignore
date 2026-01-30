@@ -1,0 +1,83 @@
+# .gitignore for IdeaForge .NET Solution
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+
+# Rider project files
+.idea/
+*.sln.iml
+
+# Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code files
+.vscode/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Resharper
+*.DotSettings
+
+# Windows image file caches
+Thumbs.db
+
+# macOS files
+.DS_Store
+
+# Logs
+*.log
+*.txt
+
+# Others
+*.dbmdl
+*.dbproj
+*.pdb
+*.cache
+*.bak
+*.swp
+*.tmp
+
+# Test results
+TestResults/
+
+# Publish output
+publish/
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+
+# Node modules (if any JS/TS projects)
+node_modules/
+
+# Ignore local environment files
+.env
+.env.*
+
+# Ignore integration test configuration (contains sensitive connection strings)
+appsettings.Integration.json
+
+# Ignore Rider workspace.xml
+workspace.xml
+
+# Ignore log files
+logs/
+
+# Ignore default Docker deployment volumes
+/deployment/volumes
