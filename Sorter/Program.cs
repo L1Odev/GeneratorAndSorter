@@ -13,6 +13,8 @@ Console.WriteLine("Sorting file from path: Common/Files/input.txt");
 
 
 // divide large file
+var chunkFolder = Path.Combine("../../../../", "Common", "Chunks");
+Directory.CreateDirectory(chunkFolder);
 string inputFilePath = Path.Combine("../../../../", "Common", "Files", "input.txt");
 string tempDirectory = Path.Combine("../../../../", "Common", "Chunks");
 string outputFilePath = Path.Combine("../../../../", "Common", "Files", "sorted_output.txt");

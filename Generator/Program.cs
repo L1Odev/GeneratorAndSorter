@@ -2,8 +2,9 @@
 
 const long maxFileSizeBytes = 8L * 1024 * 1024;
 const int maxNumber = 1_000_000;
-var outputPath = Path.Combine("../../../../", "Common", "Files", "input.txt");
-
+var fileFolder = Path.Combine("../../../../", "Common", "Files");
+var outputPath = Path.Combine(fileFolder, "input.txt");
+Directory.CreateDirectory(fileFolder);
 Console.Write("File size in MB (max 8 MB): ");
 var input = Console.ReadLine();
 
@@ -27,7 +28,7 @@ var words = new[]
 long bytesWritten = 0;
 var lineCount = 0;
 
-using (var writer = new StreamWriter(outputPath, false, Encoding.UTF8))
+using (var writer = new StreamWriter(File.Open(outputPath, FileMode.OpenOrCreate), Encoding.UTF8))
 {
     while (bytesWritten < targetSizeBytes)
     {
