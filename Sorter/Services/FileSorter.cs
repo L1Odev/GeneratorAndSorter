@@ -1,7 +1,6 @@
 ﻿using Sorter.Models;
 using Sorter.Services.ChunkProcessing;
 using Sorter.Services.FilePathProvider;
-using Sorter.Utility;
 
 namespace Sorter.Services;
 
@@ -30,7 +29,7 @@ public class FileSorter(IChunkProcessor chunkProcessor, IFilePathProvider filePa
     private static async Task MergeChunksAsync(List<string> tempFiles, string outputFilePath)
     {
         var readers = tempFiles.Select(file => new StreamReader(file)).ToArray();
-        var minHeap = new PriorityQueue<Line, string>(new SortComparer());
+        var minHeap = new PriorityQueue<Line, Line>();
         await using var outputWriter = new StreamWriter(outputFilePath);
         try
         {
@@ -39,19 +38,21 @@ public class FileSorter(IChunkProcessor chunkProcessor, IFilePathProvider filePa
                 string line = await readers[i].ReadLineAsync();
                 if (line != null)
                 {
-                    minHeap.Enqueue(new Line(i, line), line);
+                    var lineStruct = new Line(i, line);
+                    minHeap.Enqueue(lineStruct, lineStruct);
                 }
             }
 
             while (minHeap.Count > 0)
             {
                 var smallestLine = minHeap.Dequeue();
-                await outputWriter.WriteLineAsync(smallestLine.Content);
+                await outputWriter.WriteLineAsync(smallestLine.OriginalLine);
 
                 string nextLine = await readers[smallestLine.FileIndex].ReadLineAsync();
                 if (nextLine != null)
                 {
-                    minHeap.Enqueue(smallestLine with { Content = nextLine }, nextLine);
+                    var lineStruct = new Line(smallestLine.FileIndex, nextLine);
+                    minHeap.Enqueue(lineStruct, lineStruct);
                 }
             }
         }

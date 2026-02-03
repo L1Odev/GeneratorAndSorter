@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using System.Threading.Channels;
-using Sorter.Utility;
+using Sorter.Models;
 
 namespace Sorter.Services.ChunkProcessing;
 
@@ -8,7 +8,7 @@ public class ParallelChunkProcessor : IChunkProcessor
 {
     public async Task<List<string>> ProcessChunksAsync(string inputFilePath, long chunkSize, string tempDirectory)
     {
-        var channel = Channel.CreateBounded<(List<string> Lines, int ChunkIndex)>(
+        var channel = Channel.CreateBounded<List<Line>>(
             new BoundedChannelOptions(Environment.ProcessorCount)
             {
                 FullMode = BoundedChannelFullMode.Wait
@@ -30,7 +30,7 @@ public class ParallelChunkProcessor : IChunkProcessor
     private static async Task ProduceChunksAsync(
         string inputFilePath,
         long chunkSize,
-        ChannelWriter<(List<string> Lines, int ChunkIndex)> writer)
+        ChannelWriter<List<Line>> writer)
     {
         try
         {
@@ -39,7 +39,7 @@ public class ParallelChunkProcessor : IChunkProcessor
 
             while (!reader.EndOfStream)
             {
-                List<string> lines = [];
+                List<Line> lines = [];
                 long currentChunkSize = 0;
 
                 while (!reader.EndOfStream && currentChunkSize < chunkSize)
@@ -47,11 +47,12 @@ public class ParallelChunkProcessor : IChunkProcessor
                     string? line = await reader.ReadLineAsync();
                     if (line == null) continue;
 
-                    lines.Add(line);
+                    lines.Add(new Line(chunkIndex, line));
                     currentChunkSize += System.Text.Encoding.UTF8.GetByteCount(line) + Environment.NewLine.Length;
                 }
 
-                await writer.WriteAsync((lines, chunkIndex++));
+                await writer.WriteAsync(lines);
+                chunkIndex++;
             }
         }
         finally
@@ -61,15 +62,17 @@ public class ParallelChunkProcessor : IChunkProcessor
     }
 
     private async Task ConsumeChunksAsync(
-        ChannelReader<(List<string> Lines, int ChunkIndex)> reader,
+        ChannelReader<List<Line>> reader,
         string tempDirectory,
         ConcurrentBag<string> tempFiles)
     {
-        await foreach (var (lines, index) in reader.ReadAllAsync())
+        await foreach (var lines in reader.ReadAllAsync())
         {
+            var index = lines.FirstOrDefault().FileIndex;
             var sortedLines = lines
                 .AsParallel()
-                .OrderBy(line => line, new SortComparer())
+                .OrderBy(line => line)
+                .Select(line => line.OriginalLine)
                 .ToList();
             string tempFilePath = Path.Combine(tempDirectory, $"chunk_{index}.txt");
             await File.WriteAllLinesAsync(tempFilePath, sortedLines);

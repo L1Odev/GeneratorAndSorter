@@ -15,7 +15,7 @@ public class FileSorterBenchmark
     private FileSorter _sequentialSorter = null!;
     private IFilePathProvider _filePathProvider = null!;
     
-    [Params(1, 4, 8)]
+    [Params(1)]
     public int ChunkSizeMb { get; set; }
 
     [GlobalSetup]

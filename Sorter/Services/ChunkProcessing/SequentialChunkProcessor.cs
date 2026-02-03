@@ -1,4 +1,4 @@
-using Sorter.Utility;
+using Sorter.Models;
 
 namespace Sorter.Services.ChunkProcessing;
 
@@ -11,7 +11,7 @@ public class SequentialChunkProcessor : IChunkProcessor
         using var reader = new StreamReader(inputFilePath);
         while (!reader.EndOfStream)
         {
-            List<string> lines = [];
+            List<Line> lines = [];
             long currentChunkSize = 0;
 
             while (!reader.EndOfStream && currentChunkSize < chunkSize)
@@ -19,14 +19,14 @@ public class SequentialChunkProcessor : IChunkProcessor
                 string? line = await reader.ReadLineAsync();
                 if (line == null) continue;
 
-                lines.Add(line);
+                lines.Add(new Line(tempFiles.Count, line));
                 currentChunkSize += System.Text.Encoding.UTF8.GetByteCount(line) + Environment.NewLine.Length;
             }
 
-            lines.Sort(new SortComparer());
+            lines.Sort();
 
             string tempFilePath = Path.Combine(tempDirectory, $"chunk_{tempFiles.Count}.txt");
-            await File.WriteAllLinesAsync(tempFilePath, lines);
+            await File.WriteAllLinesAsync(tempFilePath, lines.Select(l => l.OriginalLine));
             tempFiles.Add(tempFilePath);
         }
 
