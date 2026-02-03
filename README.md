@@ -15,11 +15,11 @@ BenchmarkDotNet v0.14.0, Windows 11 (10.0.26100.7623)
 Unknown processor
 .NET SDK 9.0.308
 [Host]     : .NET 9.0.11 (9.0.1125.51716), X64 RyuJIT AVX2
-Job-JLJALU : .NET 9.0.11 (9.0.1125.51716), X64 RyuJIT AVX2
+Job-TKTKJJ : .NET 9.0.11 (9.0.1125.51716), X64 RyuJIT AVX2
 
 InvocationCount=1  UnrollFactor=1
 
-| Method                   | ChunkSizeMb | Mean       | Error    | StdDev   | Ratio | RatioSD | Rank | Gen0        | Gen1       | Gen2      | Allocated | Alloc Ratio |
-|------------------------- |------------ |-----------:|---------:|---------:|------:|--------:|-----:|------------:|-----------:|----------:|----------:|------------:|
-| ParallelChunkProcessor   | 1           |   694.9 ms | 14.49 ms | 42.26 ms |  0.62 |    0.05 |    1 | 218000.0000 |  9000.0000 | 2000.0000 |   2.55 GB |        1.11 |
-| SequentialChunkProcessor | 1           | 1,122.3 ms | 22.41 ms | 58.25 ms |  1.00 |    0.07 |    2 | 200000.0000 | 13000.0000 | 7000.0000 |    2.3 GB |        1.00 |
+| Method                   | ChunkSizeMb | Mean     | Error   | StdDev   | Ratio | RatioSD | Rank | Gen0       | Gen1       | Gen2      | Allocated | Alloc Ratio |
+|------------------------- |------------ |---------:|--------:|---------:|------:|--------:|-----:|-----------:|-----------:|----------:|----------:|------------:|
+| ParallelChunkProcessor   | 1           | 443.3 ms | 9.33 ms | 27.50 ms |  0.89 |    0.07 |    1 | 15000.0000 |  9000.0000 | 3000.0000 | 217.73 MB |        1.50 |
+| SequentialChunkProcessor | 1           | 498.5 ms | 9.93 ms | 23.98 ms |  1.00 |    0.07 |    2 | 13000.0000 | 10000.0000 | 6000.0000 | 145.22 MB |        1.00 |
