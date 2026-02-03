@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-const long maxFileSizeBytes = 8L * 1024 * 1024;
+const long maxFileSizeBytes = 8 * 1024 * 1024;
 const int maxNumber = 1_000_000;
 var fileFolder = Path.Combine("../../../../", "Common", "Files");
 var outputPath = Path.Combine(fileFolder, "input.txt");

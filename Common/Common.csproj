@@ -7,9 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="Files\input.txt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
+      <Folder Include="Chunks\" />
+      <Folder Include="Files\" />
     </ItemGroup>
 
 </Project>

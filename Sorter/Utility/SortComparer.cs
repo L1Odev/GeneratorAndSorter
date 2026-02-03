@@ -2,10 +2,12 @@
 
 public class SortComparer : IComparer<string>
 {
+    private const string Separator = ". ";
+
     public int Compare(string a, string b)
     {
-        var splitA = a.Split([". "], 2, StringSplitOptions.None);
-        var splitB = b.Split([". "], 2, StringSplitOptions.None);
+        var splitA = a.Split([Separator], 2, StringSplitOptions.None);
+        var splitB = b.Split([Separator], 2, StringSplitOptions.None);
 
         string stringA = splitA[1];
         string stringB = splitB[1];
