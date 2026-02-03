@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Sorter.Services;
 using Sorter.Services.ChunkProcessing;
+using Sorter.Services.FilePathProvider;
 
 var services = new ServiceCollection();
 services.AddScoped<IFileSorter, FileSorter>();
+services.AddScoped<IFilePathProvider, FilePathProvider>();
 services.AddScoped<IChunkProcessor, ParallelChunkProcessor>();
 // services.AddScoped<IChunkProcessor, SequentialChunkProcessor>();
 var app = services.BuildServiceProvider().GetRequiredService<IFileSorter>();

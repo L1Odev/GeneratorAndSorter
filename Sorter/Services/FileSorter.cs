@@ -1,23 +1,25 @@
 ﻿using Sorter.Models;
 using Sorter.Services.ChunkProcessing;
+using Sorter.Services.FilePathProvider;
 using Sorter.Utility;
 
 namespace Sorter.Services;
 
-public class FileSorter(IChunkProcessor chunkProcessor) : IFileSorter
+public class FileSorter(IChunkProcessor chunkProcessor, IFilePathProvider filePathProvider) : IFileSorter
 {
     public async Task StartAsync(int memoryLimit)
     {
-        var chunkFolder = Path.Combine("../../../../", "Common", "Chunks");
-        Directory.CreateDirectory(chunkFolder);
-        var inputFilePath = Path.Combine("../../../../", "Common", "Files", "input.txt");
-        var tempDirectory = Path.Combine("../../../../", "Common", "Chunks");
-        var outputFilePath = Path.Combine("../../../../", "Common", "Files", "sorted_output.txt");
+        Console.WriteLine(Environment.CurrentDirectory);
+        
+        Directory.CreateDirectory(filePathProvider.ChunksDirectory);
         long chunkSize = memoryLimit * 1024 * 1024; // Convert to MB
 
-        var tempChunks = await chunkProcessor.ProcessChunksAsync(inputFilePath, chunkSize, tempDirectory);
+        var tempChunks = await chunkProcessor.ProcessChunksAsync(
+            filePathProvider.InputFilePath, 
+            chunkSize, 
+            filePathProvider.ChunksDirectory);
 
-        await MergeChunksAsync(tempChunks, outputFilePath);
+        await MergeChunksAsync(tempChunks, filePathProvider.OutputFilePath);
     }
 
     /// <summary>
