@@ -7,6 +7,8 @@ The idea is to use External Sorting:
 
 
 Benchmark results of sorting 8MB file divided by 8x 1MB file chunks
+
+
 // * Summary *
 
 BenchmarkDotNet v0.14.0, Windows 11 (10.0.26100.7623)
