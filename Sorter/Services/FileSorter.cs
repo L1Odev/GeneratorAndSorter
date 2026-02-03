@@ -1,10 +1,10 @@
 ﻿using Sorter.Models;
-using Sorter.Services.Sorting;
+using Sorter.Services.ChunkProcessing;
 using Sorter.Utility;
 
 namespace Sorter.Services;
 
-public class FileSorter(ISortingStrategy sortingStrategy) : IFileSorter
+public class FileSorter(IChunkProcessor chunkProcessor) : IFileSorter
 {
     public async Task StartAsync(int memoryLimit)
     {
@@ -14,43 +14,10 @@ public class FileSorter(ISortingStrategy sortingStrategy) : IFileSorter
         var tempDirectory = Path.Combine("../../../../", "Common", "Chunks");
         var outputFilePath = Path.Combine("../../../../", "Common", "Files", "sorted_output.txt");
         long chunkSize = memoryLimit * 1024 * 1024; // Convert to MB
-        List<string> tempFiles = new List<string>();
 
-        await SaveSortedChunks(inputFilePath, chunkSize, tempDirectory, tempFiles);
+        var tempChunks = await chunkProcessor.ProcessChunksAsync(inputFilePath, chunkSize, tempDirectory);
 
-        await MergeChunksAsync(tempFiles, outputFilePath);
-    }
-
-    /// <summary>
-    /// Reads and divides large file into sorted chunks
-    /// </summary>
-    /// <param name="inputFilePath"></param>
-    /// <param name="chunkSize"></param>
-    /// <param name="tempDirectory"></param>
-    /// <param name="tempFiles"></param>
-    private async Task SaveSortedChunks(string inputFilePath, long chunkSize, string tempDirectory, List<string> tempFiles)
-    {
-        using var reader = new StreamReader(inputFilePath);
-        while (!reader.EndOfStream)
-        {
-            List<string> lines = [];
-            long currentChunkSize = 0;
-
-            while (!reader.EndOfStream && currentChunkSize < chunkSize)
-            {
-                string line = await reader.ReadLineAsync();
-                if (line == null) continue;
-                
-                lines.Add(line);
-                currentChunkSize += System.Text.Encoding.UTF8.GetByteCount(line) + Environment.NewLine.Length;
-            }
-
-            var sortedLines = sortingStrategy.Sort(lines);
-
-            string tempFilePath = Path.Combine(tempDirectory, $"chunk_{tempFiles.Count}.txt");
-            await File.WriteAllLinesAsync(tempFilePath, sortedLines);
-            tempFiles.Add(tempFilePath);
-        }
+        await MergeChunksAsync(tempChunks, outputFilePath);
     }
 
     /// <summary>
@@ -67,7 +34,7 @@ public class FileSorter(ISortingStrategy sortingStrategy) : IFileSorter
         {
             for (int i = 0; i < readers.Length; i++)
             {
-                string line = readers[i].ReadLine();
+                string line = await readers[i].ReadLineAsync();
                 if (line != null)
                 {
                     minHeap.Enqueue(new Line(i, line), line);
@@ -77,9 +44,9 @@ public class FileSorter(ISortingStrategy sortingStrategy) : IFileSorter
             while (minHeap.Count > 0)
             {
                 var smallestLine = minHeap.Dequeue();
-                outputWriter.WriteLine(smallestLine.Content);
+                await outputWriter.WriteLineAsync(smallestLine.Content);
 
-                string nextLine = readers[smallestLine.FileIndex].ReadLine();
+                string nextLine = await readers[smallestLine.FileIndex].ReadLineAsync();
                 if (nextLine != null)
                 {
                     minHeap.Enqueue(smallestLine with { Content = nextLine }, nextLine);
